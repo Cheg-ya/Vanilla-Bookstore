@@ -3,8 +3,181 @@
 // http://www.paulirish.com/2012/box-sizing-border-box-ftw/
 html, body {
     box-sizing: border-box;
-    background-color: pink;
 }
 *, *:before, *:after {
     box-sizing: inherit;
+}
+
+html {
+    background-image: url("../images/bg.jpg");
+    // background-color: white;
+    background-size: cover;
+    background-position: top center;
+}
+
+#wrapper {
+    margin: 0 auto;
+    width: 1400px;
+}
+
+#header {
+    margin: 30px;
+    text-align: center;
+}
+
+#avata {
+    display: inline-block;
+    padding: 20px;
+    margin: 30px 0;
+    border: 1px solid rgba( 255, 255, 255, 0.25);
+    border-radius: 100%;
+    background-color: rgba( 255, 255, 255, 0.075);
+}
+
+#avata img {
+    display: block;
+    border-radius: 100%;
+    width: 200px;
+    height: 200px;
+}
+
+.searchBox {
+    display: block;
+    width: 300px;
+    height: 30px;
+    margin: 0 auto;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid white;
+    padding: 0 5px;
+    outline: none;
+    caret-color: white;
+    color: white;
+    text-align: center;
+}
+
+.searchBox::placeholder {
+    color: white;
+    opacity: 0.7;
+}
+
+#header ul {
+    padding: 0;
+}
+
+ul .social {
+    display: inline-block;
+    text-decoration: none;
+}
+
+ul .social a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba( 255, 255, 255, 0.25);
+    border-radius: 100%;
+    background-color: rgba( 255, 255, 255, 0.1);
+    padding: 4px;
+    margin: 0 8px;
+}
+
+ul .social img {
+    display: inline-block;
+    width: 25px !important;
+    height: 25px !important;
+    filter: invert(100);
+    opacity: 0.6;
+}
+
+#header .displayType {
+    margin-top: 40px;
+    position: relative;
+    width: 120px;
+    left: 45.5%;
+}
+
+#header .displayType a {
+    display:inline-block;
+    border: 1px solid rgba( 255, 255, 255, 0.1);
+    border-radius: 10%;
+    padding: 10px;
+    background-color: rgba( 255, 255, 255, 0.075);
+}
+
+#header .displayType img {
+    display: block;
+    filter: invert(100);
+    opacity: 0.6;
+}
+
+
+
+
+
+.listView {
+    border: 1px solid rgba( 255, 255, 255, 0.4);
+    border-radius: 10px;
+    margin-bottom: 30px;
+    background-color: rgba( 255, 255, 255, 0.4);
+    padding: 10px;
+    font-size: 1.5rem;
+}
+
+.listThumbnail {
+    display: flex;
+}
+
+.listBookCover {
+    display: block;
+    height: 10%;
+    width: 10%;
+}
+
+.listBookInfo {
+    padding-left: 10px;
+}
+
+.listBookInfo div {
+    margin: 0 5px 5px 5px;
+}
+
+.listBookInfo h4 {
+    margin-top: 20px;
+    margin-bottom: 0;
+    margin-left: 5px;
+}
+
+.listBookInfo p {
+    margin: 5px;
+}
+
+.cardView {
+    display: inline-block;
+    width: 230px;
+    margin-bottom: 30px;
+    padding-bottom: 5px;
+    font-size: 1rem;
+    margin-left: 20px;
+}
+
+.cardThumbnail {
+    // height: 260px;
+
+}
+
+.cardBookCover {
+    display: block;
+    width: 230px;
+    height: 260px;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+}
+
+.cardBookInfo {
+    height: 100px;
+    border: 1px solid rgba( 255, 255, 255, 0.4);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    background-color: rgba( 255, 255, 255, 0.4);
+    padding: 5px;
 }
