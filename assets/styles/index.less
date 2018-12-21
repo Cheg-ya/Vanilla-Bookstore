@@ -16,6 +16,15 @@ html {
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+}
+
+.visibility {
+    display: block;
+}
+
+.hide {
+    display: none;
 }
 
 #wrapper {
@@ -24,19 +33,19 @@ body {
 }
 
 #header {
-    margin: 30px;
     text-align: center;
+    height: 500px;
 }
 
 #headerContentsWarpper {
     border: 1px solid rgba( 255, 255, 255, 0.3);
     border-radius: 20px;
-    background-color: rgba( 255, 255, 255, 0.12);
+    background-color: rgba( 255, 255, 255, 0.1);
     width: 400px;
     position: relative;
     left: 50%;
+    top: 50%;
     transform: translate(-50%);
-    margin-top: 200px;
     padding-top: 30px;
 }
 
@@ -104,6 +113,7 @@ ul .social img {
     position: relative;
     width: 120px;
     left: 45.5%;
+    top: 50%;
 }
 
 #header .displayType div {
@@ -124,8 +134,6 @@ ul .social img {
     opacity: 0.6;
 }
 
-
-
 #sectionContainer {
     width: 1200px;
     margin: 0 auto;
@@ -135,14 +143,10 @@ ul .social img {
     margin: 0 auto;
     border: 1px solid rgba( 255, 255, 255, 0.4);
     border-radius: 10px;
-    margin-bottom: 30px;
+    margin-top: 30px;
     background-color: rgba( 255, 255, 255, 0.4);
     padding: 10px;
     width: 900px;
-}
-
-.listThumbnail {
-    // display: flex;
 }
 
 .listBookImg {
@@ -152,7 +156,7 @@ ul .social img {
     border-radius: 5px;
 }
 
-.imgCover {
+.listImgCover {
     vertical-align: top;
     display: inline-block;
     height: 150px;
@@ -175,10 +179,10 @@ ul .social img {
 
 .listBookInfo .listAuthor, .listPubdate {
     font-size: 0.8rem;
-}
+}   
 
 .listBookInfo h5 {
-    margin-top: 28px;
+    margin-top: 10px;
     margin-bottom: 0;
 }
 
@@ -197,13 +201,12 @@ ul .social img {
     width: 210px;
     margin-bottom: 30px;
     padding-bottom: 5px;
-    font-size: 0.8rem;
     margin-left: 20px;
     text-decoration: none;
     color: black;
 }
 
-.cardBookCover {
+.cardBookImg {
     display: block;
     width: 100%;
     height: 250px;
@@ -218,6 +221,7 @@ ul .social img {
     border-bottom-right-radius: 10px;
     background-color: rgba( 255, 255, 255, 0.4);
     padding: 5px;
+    font-size: 0.7rem;
 }
 
 .cardBookInfo .cardTitle {
@@ -231,21 +235,72 @@ ul .social img {
     color: black;
 }
 
-#footer #button {
-    width: 100px;
-    height: 50px;
-    font-size: 1.5rem;
-    background-color: rgba( 255, 255, 255, 0.2);
-    border: 1px solid rgba( 255, 255, 255, 0.2);
-    position: relative;
+#footer {
+    height: 100px;
+}
+
+.scrollUp {
+    position: fixed;
+    right: 100px;
+    bottom: 50px;
+    border-radius: 100%;
+    background-color: rgba( 255, 255, 255, 0.4);
+    padding: 5px 10px 5px 10px;
+}
+
+.scrollUp img {
+    height: 45px;
+    width: 40px;
+    opacity: 0.9;
+}
+
+.scrollUp:hover {
+    cursor: pointer;
+}
+
+.loading {
+    position: fixed;
+    top: 50%;
     left: 50%;
-    transform: translate(-50%);
+    transform: translate(-50%, -50%);
 }
 
-.visibility {
-    display: block;
+.loading-bar {
+    display: inline-block;
+    width: 16px;
+    height: 72px;
+    border-radius: 4px;
+    animation: loading 1s ease-in-out infinite;
 }
 
-.hide {
-    display: none;
+.loading-bar:nth-child(1) {
+    background-color: #3498db;
+    animation-delay: 0;
+}
+
+.loading-bar:nth-child(2) {
+    background-color: #c0392b;
+    animation-delay: 0.09s;
+}
+
+.loading-bar:nth-child(3) {
+    background-color: #f1c40f;
+    animation-delay: .18s;
+}
+
+.loading-bar:nth-child(4) {
+    background-color: #27ae60;
+    animation-delay: .27s;
+}
+
+@keyframes loading {
+    0% {
+        transform: scale(1);
+    }
+    20% {
+        transform: scale(1, 2.2);
+    }
+    40% {
+        transform: scale(1);
+    }
 }
