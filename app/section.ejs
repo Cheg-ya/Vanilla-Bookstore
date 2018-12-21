@@ -1,0 +1,34 @@
+<section id="sectionContainer">
+    <% if (view === "list") { %>
+        <% items.forEach(function (item) { %>
+            <div class="listView">
+                <div class='listThumbnail'>
+                    <div class="imgCover"><img class="listBookImg" src="<%= item.image %>" onerror="this.src='../assets/images/default.png'" />
+                    </div>
+                    <div class="listBookInfo">
+                    <div class="listTitle"><%= item.title.slice(0, 50) %></div>
+                    <div class="listAuthor">저자 : <%= item.author %> ㅣ 출판사 : <%= item.publisher %></div>
+                    <div class="listPubdate">출판일 : <%= item.pubdate %></div>
+                    <div>
+                        <h5>책 소개 <a href="<%= item.url %>">(URL: <%= item.url %>)</a></h5>
+                        <p><%= item.description.slice(0, 50) + "..." %></p>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        <% }) %>
+    <% } else { %>
+        <% items.forEach(function (item) { %>
+            <a class="cardView" href="<%= item.url %>">
+                <div class='cardThumbnail'>
+                    <img class="cardBookCover" src="<%= item.image %>" onerror="this.src='../assets/images/default.png'" alt="">
+                    <div class="cardBookInfo">
+                        <div class="cardTitle"><%= item.title.slice(0, 12) %></div>
+                        <div class="cardAuthor"><%= item.author.split('|')[0] %>ㅣ<%= item.publisher %></div>
+                        <div class="cardPubdate"><%= item.pubdate %></div>
+                    </div>
+                </div>
+            </a>
+        <% }) %>
+    <% } %>
+</section>
