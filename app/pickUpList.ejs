@@ -1,0 +1,22 @@
+<div id="pickUp">
+    <% if (items.length !== 0) { %>
+        <% items.forEach(function (item) { %>
+            <div class="pickUpList">
+                <div class="PickUpImgCover">
+                    <img class="pickUpImg" src="<%= item.image %>" onerror="this.src='../assets/images/default.png'" />
+                </div>
+                <div class="pickUpInfo">
+                    <div class="pickUpTitle">
+                        <%= item.title.slice(0, 22) %>
+                    </div>
+                    <div class="pickUpAuthor">
+                        <%= item.author.split('|').length > 1 ? item.author.split('|')[0] + " 외" : item.author %>
+                    </div>
+                    <div>
+                        <%= item.publisher %>
+                    </div>
+                </div>
+            </div>
+        <% }) %>
+    <% } %>
+</div>

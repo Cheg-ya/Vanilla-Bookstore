@@ -10,17 +10,20 @@ import wrapperTemplate from 'wrapper.ejs';
 import headerTemplate from 'header.ejs';
 import sectionTemplate from 'section.ejs';
 import footerTemplate from 'footer.ejs';
-import loadingTemplate from 'loading.ejs';
+import pickUpTemplate from 'pickUpList.ejs';
 
 // Import Gorilla Module
 import Gorilla from '../Gorilla';;
 
-let storage = { items: [], view: "list",};
-let section = new Gorilla.Component(sectionTemplate, storage);
-const header = new Gorilla.Component(headerTemplate);
-const footer = new Gorilla.Component(footerTemplate);
+let storage = { items: [], view: "list"};
+let pickUpItem = { items: [] };
+const pickUpCover = new Gorilla.Component(pickUpTemplate, pickUpItem);
+const section = new Gorilla.Component(sectionTemplate, storage);
+const header = new Gorilla.Component(headerTemplate, {});
+const footer = new Gorilla.Component(footerTemplate, {});
 const wrapper = new Gorilla.Component(wrapperTemplate, {}, {
   header,
+  pickUpCover,
   section,
   footer
 });
@@ -34,13 +37,13 @@ const listViewer = document.getElementById('list-view');
 const cardViewer = document.getElementById('card-view');
 const displayType = document.getElementsByClassName('displayType')[0];
 const scrollUp = document.getElementsByClassName('scrollUp')[0];
+const loadingEffect = document.getElementsByClassName('loading')[0];
+const list = document.getElementsByClassName('listView');
+const pickUpContainer = document.getElementById('pickUp');
 
 let searchTarget;
-let loading;
 let displayNumber = 10;
 let onProgress = false;
-let list = "list";
-let card = "card";
 
 searchButton.addEventListener('click', function (ev) {
   displayNumber = 10;
@@ -52,7 +55,12 @@ searchButton.addEventListener('click', function (ev) {
   }
 
   if (!onProgress) {
+    if (storage.items.length) {
+      storage.items = [];
+    }
+
     searchTarget = searchBox.value;
+
     return searchAjax(searchTarget, displayNumber); 
   }
 
@@ -75,7 +83,12 @@ searchBox.addEventListener('keyup', function (ev) {
     }
 
     if (!onProgress) {
+      if (storage.items.length) {
+        storage.items = [];
+      }
+
       searchTarget = ev.target.value;
+      
       return searchAjax(searchTarget, displayNumber);
     }
     
@@ -83,14 +96,14 @@ searchBox.addEventListener('keyup', function (ev) {
   }
 });
 
-listViewer.addEventListener('click', function (ev) {
+listViewer.addEventListener('click', function () {
   if (storage.view === "list") return;
-  viewer(storage.items, list);
+  viewer(storage.items, "list");
 });
 
-cardViewer.addEventListener('click', function (ev) {
+cardViewer.addEventListener('click', function () {
   if (storage.view === "card") return;
-  viewer(storage.items, card);
+  viewer(storage.items, "card");
 });
 
 scrollUp.addEventListener('click', toTheTop);
@@ -108,57 +121,70 @@ function infiniteScroll () {
   let scrollPosition = Math.round(window.scrollY);
   let bodyHeight = document.body.offsetHeight;
   let windowHeight = window.innerHeight;
+  let reachBottom = bodyHeight - scrollPosition - windowHeight;
 
-  // console.log(bodyHeight- scrollPosition- windowHeight);
-
-  if (bodyHeight - scrollPosition - windowHeight === 0) {
-    window.scroll(0, scrollPosition - 10);
-
+  if (reachBottom >= 0 && reachBottom < 20) {
     if (!onProgress) {
       displayNumber+= 20;
-
-      if (displayNumber >= 100) {
-        alert("검색 결과는 최대 100개 이하 입니다.");
-        throw new Error('검색 결과 한도 초과');
-      }
-
       searchAjax(searchTarget);
     }
-
-    // alert('검색 결과 처리 중');
   }
 }
 
 function searchAjax (input) {
-  loading = new Gorilla.Component(loadingTemplate, {});
-  Gorilla.renderToDOM(loading, document.querySelector('footer'));
   const request = new XMLHttpRequest();
   let target = input;
-  let urlIdx = 0;
+  
+  loadingEffect.classList.remove('hide');
+  loadingEffect.classList.add('visibility');
   onProgress = true;
 
-  request.open('GET', 'http://localhost:3000/v1/search/book?query=' + target + '&display=' + displayNumber, true);
+  request.open('GET', 'http://localhost:3000/v1/search/book?query=' + target + '&start=' + displayNumber, true);
   request.onreadystatechange = function () {
     if (request.readyState === 4 && request.status === 200) {
       let originData = request.responseText;
       originData = JSON.parse(originData);
+
       let items = originData.items;
+      let oldData = storage.items;
 
       if (!items.length) {
-        setTimeout(() => {onProgress = false}, 2000);
+        setTimeout(() => {onProgress = false}, 1000);
         alert('검색 결과 없음');
+
+        loadingEffect.classList.remove('visibility');
+        loadingEffect.classList.add('hide');
 
         throw new Error('검색 결과 없음');
       }
 
-      items.forEach(function (item) {
-        item.title = item.title.split('(')[0].trim().split('<b>').join('').split('</b>').join('');
-        item.author = item.author.split('<b>').join('').split('</b>').join('');
-        item.description = item.description.split('<b>').join('').split('</b>').join('');
-        item.pubdate = `${item.pubdate.slice(0,4)}년 ${item.pubdate.slice(4,6)}월 ${item.pubdate.slice(6)}일`;
-      });
+      if (!oldData.length) {
+        items.forEach(function (item) {
+          item.title = item.title.split('(')[0].trim().split('<b>').join('').split('</b>').join('');
+          item.author = item.author.split('<b>').join('').split('</b>').join('');
+          item.description = item.description.split('<b>').join('').split('</b>').join('');
+          item.pubdate = `${item.pubdate.slice(0,4)}년 ${item.pubdate.slice(4,6)}월 ${item.pubdate.slice(6)}일`;
+        });
 
-      urlAjax(items, urlIdx);
+        let urlIdx = 0;
+
+        urlAjax(items, urlIdx);
+
+      } else if (oldData.length > 0) {
+        let urlIdx = oldData.length;
+        items = items.slice();
+
+        items.forEach(function (item) {
+          item.title = item.title.split('(')[0].trim().split('<b>').join('').split('</b>').join('');
+          item.author = item.author.split('<b>').join('').split('</b>').join('');
+          item.description = item.description.split('<b>').join('').split('</b>').join('');
+          item.pubdate = `${item.pubdate.slice(0,4)}년 ${item.pubdate.slice(4,6)}월 ${item.pubdate.slice(6)}일`;
+        });
+
+        let newData = oldData.concat(items);
+
+        urlAjax(newData, urlIdx);
+      }
     }
   }
 
@@ -174,19 +200,20 @@ function urlAjax (data, idx) {
     if (urlRequest.readyState === 4 && urlRequest.status === 200) {
       let url = urlRequest.responseText;
       url = JSON.parse(url);
-
       items[idx].url = url.result.url;
 
-      if (idx === data.length - 1 && bookContainer.children.length === 0) {
-        setTimeout(() => {onProgress = false}, 1000);
+      if (idx === items.length - 1 && !bookContainer.children.length) {
+        setTimeout(() => {
+          onProgress = false;
+        }, 1000);
 
-        if (storage.view === list) {
-          return viewer(data, list);
+        if (storage.view === "list") {
+          return viewer(data, "list");
         }
 
-        return viewer(data, card);
+        return viewer(data, "card");
       }
-      
+
       idx++;
 
       urlAjax(items, idx);
@@ -197,25 +224,47 @@ function urlAjax (data, idx) {
 }
 
 function viewer (data, type) {
-  bookContainer.innerHTML= '';
+  if (type === "list") {
+    storage["view"] = type;
 
-  if (type === list) {
-    storage["view"] = list;
-
-  } else if (type === card) {
-    storage["view"] = card;
+  } else if (type === "card") {
+    storage["view"] = type;
   }
 
   storage["items"] = data;
-
-  section.render();
-  loading.destroy();
 
   if (displayType.classList.contains('hide')) {
     displayType.classList.remove('hide');
     displayType.classList.add('visibility');
     scrollUp.classList.remove('hide');
     scrollUp.classList.add('visibility');
+  }
+
+  if (!loadingEffect.classList.contains('hide')) {
+    loadingEffect.classList.remove('visibility');
+    loadingEffect.classList.add('hide');
+  }
+
+  section.render();
+
+  if (type === "list") {
+    window.scroll(0, window.scrollY-2006);
+
+  } else {
+    window.scroll(0, window.scrollY-751);
+  }
+
+  for (let i = 0; i < list.length; i++) {
+    if (type === 'list') {
+      list[i].addEventListener('click', function (ev) {
+        let idx = Number(ev.currentTarget.id);
+        
+        if (!pickUpItem.items.includes(data[idx-1])) {
+          pickUpItem.items.unshift(data[idx-1]);
+          pickUpCover.render();
+        }
+      });
+    }
   }
 }
 

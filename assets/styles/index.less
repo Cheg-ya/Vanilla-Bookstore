@@ -20,11 +20,11 @@ body {
 }
 
 .visibility {
-    display: block;
+    display: block !important;
 }
 
 .hide {
-    display: none;
+    display: none !important;
 }
 
 #wrapper {
@@ -38,10 +38,11 @@ body {
 }
 
 #headerContentsWarpper {
-    border: 1px solid rgba( 255, 255, 255, 0.3);
+    border: 1px solid rgba( 255, 255, 255, 0.2);
     border-radius: 20px;
     background-color: rgba( 255, 255, 255, 0.1);
     width: 400px;
+    height: 100px;
     position: relative;
     left: 50%;
     top: 50%;
@@ -80,34 +81,6 @@ body {
     opacity: 0.7;
 }
 
-#header ul {
-    padding: 0;
-}
-
-ul .social {
-    display: inline-block;
-    text-decoration: none;
-}
-
-ul .social a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba( 255, 255, 255, 0.25);
-    border-radius: 100%;
-    background-color: rgba( 255, 255, 255, 0.1);
-    padding: 4px;
-    margin: 0 8px;
-}
-
-ul .social img {
-    display: inline-block;
-    width: 25px !important;
-    height: 25px !important;
-    filter: invert(100);
-    opacity: 0.6;
-}
-
 #header .displayType {
     margin-top: 40px;
     position: relative;
@@ -134,20 +107,91 @@ ul .social img {
     opacity: 0.6;
 }
 
+#pickUp {
+    font-size: 0.7rem;
+    position: fixed;
+    top: 10%;
+    right: 0.5%;
+    width: 290px;
+    height: 500px;
+    border-radius: 10px;
+    padding: 5px;
+    text-align: left;
+    color: white;
+    overflow-y:scroll;
+    overflow-x: hidden;
+    &::-webkit-scrollbar { 
+        display: none !important;
+    }
+    z-index: 1;
+}
+
+.pickUpList {
+    border-bottom: 1px solid rgba( 255, 255, 255, 0.4);
+    margin-bottom: 5px;
+    padding-top: 2px;
+    padding-left: 2px;
+}
+
+.pickUpInfo {
+    display: inline-block;
+    height: 70px;
+    vertical-align: top;
+}
+
+.pickUpInfo div {
+    position: relative;
+    top: 20%;
+}
+
+#pickUp .PickUpImgCover {
+    width: 50px;
+    height: 70px;
+    display: inline-block;
+}
+
+.PickUpImgCover img {
+    height: 100%;
+    width: 100%;
+    border-radius: 5px;
+}
+
 #sectionContainer {
     width: 1200px;
     margin: 0 auto;
 }
 
 .listView {
+    position: relative;
     margin: 0 auto;
-    border: 1px solid rgba( 255, 255, 255, 0.4);
     border-radius: 10px;
-    margin-top: 30px;
+    margin-bottom: 30px;
     background-color: rgba( 255, 255, 255, 0.4);
     padding: 10px;
     width: 900px;
+    transition: all .8s linear;
+}   
+
+.listView:hover {
+    background-color: black;
 }
+
+.listView .list-descript {
+    position: absolute;
+    width: 700px;
+    left: 15%;
+    top: 16%;
+    color: white;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity .8s linear;
+}
+
+.listView:hover .list-descript {
+    visibility: visible;
+    opacity: 1;
+}
+
 
 .listBookImg {
     line-height: 200px;
@@ -193,6 +237,7 @@ ul .social img {
 
 .listBookInfo p {
     margin: 5px 0;
+    font-size: 0.9rem;
 }
 
 .cardView {
@@ -204,6 +249,32 @@ ul .social img {
     margin-left: 20px;
     text-decoration: none;
     color: black;
+    position: relative;
+}
+
+.cardView .card-descript {
+    position: absolute;
+    font-size: 0.85rem;
+    text-align: center;
+    margin: 0;
+    padding: 10px;
+    padding-top: 30px;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    width: 210px;
+    height: 250px;
+    left: 0%;
+    top: 0%;
+    color: white;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity .8s linear;
+}
+
+.cardView:hover .card-descript {
+    background-color: black;
+    visibility: visible;
+    opacity: 1;
 }
 
 .cardBookImg {
@@ -216,7 +287,6 @@ ul .social img {
 
 .cardBookInfo {
     height: 90px;
-    border: 1px solid rgba( 255, 255, 255, 0.4);
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
     background-color: rgba( 255, 255, 255, 0.4);
@@ -233,10 +303,6 @@ ul .social img {
 .cardBookInfo a {
     text-decoration: none;
     color: black;
-}
-
-#footer {
-    height: 100px;
 }
 
 .scrollUp {
@@ -258,6 +324,10 @@ ul .social img {
     cursor: pointer;
 }
 
+#footer {
+    height: 30px;
+}
+
 .loading {
     position: fixed;
     top: 50%;
@@ -270,7 +340,7 @@ ul .social img {
     width: 16px;
     height: 72px;
     border-radius: 4px;
-    animation: loading 1s ease-in-out infinite;
+    animation: loading 1.6s ease-in-out infinite;
 }
 
 .loading-bar:nth-child(1) {

@@ -1,34 +1,62 @@
 <section id="sectionContainer">
     <% if (view === "list") { %>
+        <% let idx = 1 %>
         <% items.forEach(function (item) { %>
-            <div class="listView">
-                <div class="listImgCover">
+            <div class="listView" id="<%= idx %>">
+                <a class="listImgCover" href = "<%= item.url %>">
                     <img class="listBookImg" src="<%= item.image %>" onerror="this.src='../assets/images/default.png'" />
-                </div>
+                </a>
                 <div class="listBookInfo">
-                    <div class="listTitle"><%= item.title %></div>
-                    <div class="listAuthor">저자 : <%= item.author %> ㅣ 출판사 : <%= item.publisher %></div>
-                    <div class="listPubdate">출판일 : <%= item.pubdate %></div>
-                    <div class="listPubdate">가격 : <%= item.price %>원</div>
+                    <div class="listTitle">
+                        <%= item.title %>
+                    </div>
+                    <div class="listAuthor">
+                        저자 : <%= item.author.split('|').length > 1 ? item.author.split('|')[0] + " 외" : item.author %> ㅣ 출판사 : <%= item.publisher %>
+                    </div>
+                    <div class="listPubdate">
+                        출판일 : <%= item.pubdate %>
+                    </div>
+                    <div class="listPubdate">
+                        가격 : <% let price = Number(item.price) %><%= price.toLocaleString() %>원
+                    </div>
                     <div>
-                        <h5>책 소개 <a href="<%= item.url %>">(URL: <%= item.url %>)</a></h5>
-                        <p><%= item.description.slice(0, 50) + "..." %></p>
+                        <h5>
+                            책 소개 (URL: <%= item.url %>)
+                        </h5>
+                        <p>
+                            <%= item.description.slice(0, 50) + "..." %>
+                        </p>
                     </div>
                 </div>
+                <p class="list-descript"><%= item.description %></p>
             </div>
+            <% idx++ %>
         <% }) %>
+
     <% } else { %>
+        <% let idx = 1 %>
         <% items.forEach(function (item) { %>
             <a class="cardView" href="<%= item.url %>">
                 <div class='cardThumbnail'>
                     <img class="cardBookImg" src="<%= item.image %>" onerror="this.src='../assets/images/default.png'" alt="">
                     <div class="cardBookInfo">
-                        <div class="cardTitle"><%= item.title.slice(0, 13) %></div>
-                        <div class="cardAuthor"><%= item.author.split('|').length > 1 ? item.author.split('|')[0] + " 외" : item.author %>ㅣ<%= item.publisher %></div>
-                        <div class="cardPubdate"><%= item.pubdate %></div>
+                        <div class="cardTitle">
+                            <%= item.title.slice(0, 13) %>
+                        </div>
+                        <div class="cardAuthor">
+                            <%= item.author.split('|').length > 1 ? item.author.split('|')[0] + " 외" : item.author %> | <%= item.publisher %>
+                        </div>
+                        <div class="cardPubdate">
+                            <%= item.pubdate %>
+                        </div>
                     </div>
                 </div>
+                <p class="card-descript">
+                    <%= item.description %>
+                </p>
             </a>
         <% }) %>
+
+        <% idx++ %>
     <% } %>
 </section>
