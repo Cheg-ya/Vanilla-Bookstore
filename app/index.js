@@ -24,12 +24,12 @@ const requestAPI = {
       const xhr = new XMLHttpRequest();
       const adress = `http://localhost:3000/v1/search/book?query=${query}&start=${that.displayNumber}`;
 
-      xhr.open('GET', adress, true)
+      xhr.open('GET', adress, true);
       xhr.responseType = 'json';
       xhr.onload = function () {
         setTimeout(function () {
           that.reqeustOnProgress = false;
-        } ,2000)
+        } ,2000);
 
         app.loadingOn = 'hide';
 
@@ -55,7 +55,7 @@ const requestAPI = {
           const urlXhr = new XMLHttpRequest();
           const url = `http://localhost:3000/v1/util/shorturl?url=${res.items[i].link}`;
       
-          urlXhr.open('GET', url, true)
+          urlXhr.open('GET', url, true);
           urlXhr.responseType = 'json';
 
           urlXhr.onload = function () {
