@@ -1,0 +1,24 @@
+<header id="header">
+    <!-- serach box and button -->
+    <div id="headerContentsWarpper">
+        <input type="text" id="searchBox" placeholder="Banana Book Store!" value="<%= searchValue %>" gorilla-keyup="onInputChange"/>
+        <button class="searchButton" gorilla-click="onSearchClick"><img src="../assets/images/magnifying-glass.png" alt=""></button>
+    </div>
+    <div class="displayType visibility">
+        <div id="list-view" gorilla-click="displayList">
+            <img src="../assets/images/view-list.png" alt="">
+        </div>
+        <div id="card-view" gorilla-click="displayCard">
+            <img src="../assets/images/card-view.png" alt="">
+        </div>
+    </div>
+    <div class="scrollUp visibility" gorilla-click="scrollUp">
+        <img src="../assets/images/arrow.png" alt="" />
+    </div>
+    <div class="loading <%= loadingOn %>">
+        <div class="loading-bar"></div>
+        <div class="loading-bar"></div>
+        <div class="loading-bar"></div>
+        <div class="loading-bar"></div>
+    </div>
+</header>

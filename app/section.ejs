@@ -1,8 +1,7 @@
 <section id="sectionContainer">
-    <% if (view === "list") { %>
-        <% let idx = 1 %>
+    <% if (displayType === "list") { %>
         <% items.forEach(function (item) { %>
-            <div class="listView" id="<%= idx %>">
+            <div class="listView">
                 <a class="listImgCover" href = "<%= item.url %>">
                     <img class="listBookImg" src="<%= item.image %>" onerror="this.src='../assets/images/default.png'" />
                 </a>
@@ -30,11 +29,9 @@
                 </div>
                 <p class="list-descript"><%= item.description %></p>
             </div>
-            <% idx++ %>
         <% }) %>
 
     <% } else { %>
-        <% let idx = 1 %>
         <% items.forEach(function (item) { %>
             <a class="cardView" href="<%= item.url %>">
                 <div class='cardThumbnail'>
@@ -56,7 +53,5 @@
                 </p>
             </a>
         <% }) %>
-
-        <% idx++ %>
-    <% } %>
+    <% } %>  
 </section>

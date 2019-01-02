@@ -7,266 +7,198 @@ import 'styles/index.less';
 
 // Importing component templates
 import wrapperTemplate from 'wrapper.ejs';
-import headerTemplate from 'header.ejs';
+import headerTemplate from 'app.ejs';
 import sectionTemplate from 'section.ejs';
-import footerTemplate from 'footer.ejs';
-import pickUpTemplate from 'pickUpList.ejs';
 
 // Import Gorilla Module
-import Gorilla from '../Gorilla';;
+import Gorilla from '../Gorilla';
 
-let storage = { items: [], view: "list"};
-let pickUpItem = { items: [] };
-const pickUpCover = new Gorilla.Component(pickUpTemplate, pickUpItem);
-const section = new Gorilla.Component(sectionTemplate, storage);
-const header = new Gorilla.Component(headerTemplate, {});
-const footer = new Gorilla.Component(footerTemplate, {});
-const wrapper = new Gorilla.Component(wrapperTemplate, {}, {
-  header,
-  pickUpCover,
-  section,
-  footer
-});
+const requestAPI = {
+  displayNumber: 1,
+  reqeustOnProgress: false,
 
-Gorilla.renderToDOM(wrapper, document.querySelector('body'));
+  getBooks(query) {
+    const that = this;
 
-const searchBox = document.getElementById('searchBox');
-const searchButton = document.getElementsByClassName('glass')[0];
-const bookContainer = document.getElementById('sectionContainer');
-const listViewer = document.getElementById('list-view');
-const cardViewer = document.getElementById('card-view');
-const displayType = document.getElementsByClassName('displayType')[0];
-const scrollUp = document.getElementsByClassName('scrollUp')[0];
-const loadingEffect = document.getElementsByClassName('loading')[0];
-const list = document.getElementsByClassName('listView');
-const pickUpContainer = document.getElementById('pickUp');
+    return new Promise(function (resolve, reject) {
+      const xhr = new XMLHttpRequest();
+      const adress = `http://localhost:3000/v1/search/book?query=${query}&start=${that.displayNumber}`;
 
-let searchTarget;
-let displayNumber = 10;
-let onProgress = false;
+      xhr.open('GET', adress, true)
+      xhr.responseType = 'json';
+      xhr.onload = function () {
+        setTimeout(function () {
+          that.reqeustOnProgress = false;
+        } ,2000)
 
-searchButton.addEventListener('click', function (ev) {
-  displayNumber = 10;
-  ev.preventDefault();
+        app.loadingOn = 'hide';
 
-  if (searchBox.value.length > 20 || searchBox.value.length === 0) {
-    alert('검색어는 1글자 이상 20글자 이하 (공백 포함)여야 합니다.');
-    throw new Error('글자수 제한 에러');
-  }
+        if (!xhr.response.items.length) {
+          alert('검색 결과 없음');
+          return;
+        }
 
-  if (!onProgress) {
-    if (storage.items.length) {
-      storage.items = [];
-    }
-
-    searchTarget = searchBox.value;
-
-    return searchAjax(searchTarget, displayNumber); 
-  }
-
-  alert('검색 결과 처리 중');
-});
-
-searchBox.addEventListener('keyup', function (ev) {
-  displayNumber = 10;
-  ev.preventDefault();
-
-  if (ev.target.value.length > 20) {
-    alert('검색어는 1글자 이상 20글자 이하 (공백 포함)여야 합니다.');
-    throw new Error('글자수 제한');
-  }
-
-  if (ev.keyCode === 13) {
-    if (ev.target.value.length === 0) {
-      alert('검색어는 1글자 이상 20글자 이하 (공백 포함)여야 합니다.');
-      throw new Error('글자수 제한');
-    }
-
-    if (!onProgress) {
-      if (storage.items.length) {
-        storage.items = [];
+        resolve(xhr.response);
       }
 
-      searchTarget = ev.target.value;
+      xhr.onError = function () {
+        reject("서버 에러발생");
+      }
+
+      xhr.send();
+
+    }).then(function recursivePromise(res) {
+      const result = [];
+
+      for (let i = 0; i < res.items.length; i++) {
+        result.push(new Promise(function (resolve) {
+          const urlXhr = new XMLHttpRequest();
+          const url = `http://localhost:3000/v1/util/shorturl?url=${res.items[i].link}`;
       
-      return searchAjax(searchTarget, displayNumber);
+          urlXhr.open('GET', url, true)
+          urlXhr.responseType = 'json';
+
+          urlXhr.onload = function () {
+            const itemUrl = urlXhr.response.result.url;
+            
+            res.items[i].url = itemUrl;
+            resolve(res.items[i]);
+          }
+
+          urlXhr.onError = function () {
+            reject("URL 서버 에러발생");
+          }
+
+          urlXhr.send();
+        }));
+      }
+
+      return Promise.all(result);
+
+    }).then(function (res) {
+      res.forEach(function (item) {
+          item.title = item.title.split('(')[0].trim().split('<b>').join('').split('</b>').join('');
+          item.author = item.author.split('<b>').join('').split('</b>').join('');
+          item.description = item.description.split('<b>').join('').split('</b>').join('');
+          item.pubdate = `${item.pubdate.slice(0,4)}년 ${item.pubdate.slice(4,6)}월 ${item.pubdate.slice(6)}일`;
+      });
+
+      return res;
+    });
+  }
+}
+
+const section = new Gorilla.Component(sectionTemplate, {
+   items: [],
+   displayType: 'list'
+});
+
+const app = new Gorilla.Component(headerTemplate, {
+  searchValue: '',
+  loadingOn: 'hide'
+});
+
+app.onInputChange = function (ev) {
+  if (ev.keyCode === 13) {
+    if (requestAPI.reqeustOnProgress) {
+      alert('검색 결과 처리중 2초 후 다시시도');
+      return;
+    }
+
+    if (ev.target.value.length > 20 || ev.target.value.length === 0) {
+      alert('검색어는 1글자 이상 20글자 이하 (공백 포함)여야 합니다.');
+      ev.target.value = '';
+      return;
     }
     
-    alert('검색 결과 처리 중');
+    if (section.items.length > 0) {
+      section.items = [];
+    }
+
+    app.searchValue = ev.target.value;
+    app.loadingOn = 'visibility';
+    requestAPI.reqeustOnProgress = true;
+  
+    requestAPI.getBooks(app.searchValue).then(function (items) {
+      if (!section.items.length) {
+        section.items = items;
+      } else {
+        section.items = section.items.concat(items);
+      }
+    });
   }
-});
+}
 
-listViewer.addEventListener('click', function () {
-  if (storage.view === "list") return;
-  viewer(storage.items, "list");
-});
+app.onSearchClick = function () {
+  if (!app.searchValue.length || app.searchValue.length > 20) {
+    alert('검색어는 1글자 이상 20글자 이하 (공백 포함)여야 합니다.');
+    ev.target.value = '';
+    return;
+  }
 
-cardViewer.addEventListener('click', function () {
-  if (storage.view === "card") return;
-  viewer(storage.items, "card");
-});
+  if (requestAPI.reqeustOnProgress) {
+    alert('검색 결과 처리중 2초 후 다시시도');
+    return;
+  }
 
-scrollUp.addEventListener('click', toTheTop);
+  if (section.items.length > 0) {
+    section.items = [];
+  }
+  
+  app.loadingOn = 'visibility';
+  requestAPI.reqeustOnProgress = true;
 
-function toTheTop () {
+  requestAPI.getBooks(app.searchValue).then(function (items) {
+    if (!section.items.length) {
+      section.items = items;
+    } else {
+      section.items = section.items.concat(items);
+    }
+  });
+}
+
+app.displayList = function() {
+  section.displayType = 'list';
+}
+
+app.displayCard = function() {
+  section.displayType = 'card';
+}
+
+app.scrollUp = function () {
   window.scroll({
     top: 0,
     behavior: 'smooth'
   });
 }
 
+const wrapper = new Gorilla.Component(wrapperTemplate, {}, {
+  app,
+  section,
+});
+
 document.addEventListener('scroll', infiniteScroll);
 
 function infiniteScroll () {
-  let scrollPosition = Math.round(window.scrollY);
-  let bodyHeight = document.body.offsetHeight;
-  let windowHeight = window.innerHeight;
-  let reachBottom = bodyHeight - scrollPosition - windowHeight;
+  const scrollPosition = Math.round(window.scrollY);
+  const bodyHeight = document.body.offsetHeight;
+  const windowHeight = window.innerHeight;
+  const reachBottom = bodyHeight - scrollPosition - windowHeight;
 
-  if (reachBottom >= 0 && reachBottom < 20) {
-    if (!onProgress) {
-      displayNumber+= 20;
-      searchAjax(searchTarget);
-    }
-  }
-}
+  if (reachBottom >= 0 && reachBottom < 30) {
+    if (!requestAPI.reqeustOnProgress) {
+      app.loadingOn = 'visibility';
+      requestAPI.reqeustOnProgress = true;
+      requestAPI.displayNumber+= 10;
 
-function searchAjax (input) {
-  const request = new XMLHttpRequest();
-  let target = input;
-  
-  loadingEffect.classList.remove('hide');
-  loadingEffect.classList.add('visibility');
-  onProgress = true;
-
-  request.open('GET', 'http://localhost:3000/v1/search/book?query=' + target + '&start=' + displayNumber, true);
-  request.onreadystatechange = function () {
-    if (request.readyState === 4 && request.status === 200) {
-      let originData = request.responseText;
-      originData = JSON.parse(originData);
-
-      let items = originData.items;
-      let oldData = storage.items;
-
-      if (!items.length) {
-        setTimeout(() => {onProgress = false}, 1000);
-        alert('검색 결과 없음');
-
-        loadingEffect.classList.remove('visibility');
-        loadingEffect.classList.add('hide');
-
-        throw new Error('검색 결과 없음');
-      }
-
-      if (!oldData.length) {
-        items.forEach(function (item) {
-          item.title = item.title.split('(')[0].trim().split('<b>').join('').split('</b>').join('');
-          item.author = item.author.split('<b>').join('').split('</b>').join('');
-          item.description = item.description.split('<b>').join('').split('</b>').join('');
-          item.pubdate = `${item.pubdate.slice(0,4)}년 ${item.pubdate.slice(4,6)}월 ${item.pubdate.slice(6)}일`;
-        });
-
-        let urlIdx = 0;
-
-        urlAjax(items, urlIdx);
-
-      } else if (oldData.length > 0) {
-        let urlIdx = oldData.length;
-        items = items.slice();
-
-        items.forEach(function (item) {
-          item.title = item.title.split('(')[0].trim().split('<b>').join('').split('</b>').join('');
-          item.author = item.author.split('<b>').join('').split('</b>').join('');
-          item.description = item.description.split('<b>').join('').split('</b>').join('');
-          item.pubdate = `${item.pubdate.slice(0,4)}년 ${item.pubdate.slice(4,6)}월 ${item.pubdate.slice(6)}일`;
-        });
-
-        let newData = oldData.concat(items);
-
-        urlAjax(newData, urlIdx);
-      }
-    }
-  }
-
-  request.send(null);
-}
-
-function urlAjax (data, idx) {
-  let items = data;
-  let urlRequest = new XMLHttpRequest();
-
-  urlRequest.open('GET', 'http://localhost:3000/v1/util/shorturl?url=' + items[idx].link, true);
-  urlRequest.onreadystatechange = function () {
-    if (urlRequest.readyState === 4 && urlRequest.status === 200) {
-      let url = urlRequest.responseText;
-      url = JSON.parse(url);
-      items[idx].url = url.result.url;
-
-      if (idx === items.length - 1 && !bookContainer.children.length) {
-        setTimeout(() => {
-          onProgress = false;
-        }, 1000);
-
-        if (storage.view === "list") {
-          return viewer(data, "list");
-        }
-
-        return viewer(data, "card");
-      }
-
-      idx++;
-
-      urlAjax(items, idx);
-    }
-  }
-
-  urlRequest.send(null);
-}
-
-function viewer (data, type) {
-  if (type === "list") {
-    storage["view"] = type;
-
-  } else if (type === "card") {
-    storage["view"] = type;
-  }
-
-  storage["items"] = data;
-
-  if (displayType.classList.contains('hide')) {
-    displayType.classList.remove('hide');
-    displayType.classList.add('visibility');
-    scrollUp.classList.remove('hide');
-    scrollUp.classList.add('visibility');
-  }
-
-  if (!loadingEffect.classList.contains('hide')) {
-    loadingEffect.classList.remove('visibility');
-    loadingEffect.classList.add('hide');
-  }
-
-  section.render();
-
-  if (type === "list") {
-    window.scroll(0, window.scrollY-2006);
-
-  } else {
-    window.scroll(0, window.scrollY-751);
-  }
-
-  for (let i = 0; i < list.length; i++) {
-    if (type === 'list') {
-      list[i].addEventListener('click', function (ev) {
-        let idx = Number(ev.currentTarget.id);
-        
-        if (!pickUpItem.items.includes(data[idx-1])) {
-          pickUpItem.items.unshift(data[idx-1]);
-          pickUpCover.render();
-        }
+      requestAPI.getBooks(app.searchValue).then(function (items) {
+        section.items = section.items.concat(items);
       });
     }
   }
 }
+
+Gorilla.renderToDOM(wrapper, document.querySelector('body'));
 
 /* DO NOT REMOVE */
 module.hot.accept();
