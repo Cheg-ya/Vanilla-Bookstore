@@ -42,7 +42,7 @@ const requestAPI = {
       }
 
       xhr.onError = function () {
-        reject("서버 에러발생");
+        reject('서버 에러발생');
       }
 
       xhr.send();
@@ -54,19 +54,18 @@ const requestAPI = {
         result.push(new Promise(function (resolve) {
           const urlXhr = new XMLHttpRequest();
           const url = `http://localhost:3000/v1/util/shorturl?url=${res.items[i].link}`;
-      
+
           urlXhr.open('GET', url, true);
           urlXhr.responseType = 'json';
 
           urlXhr.onload = function () {
             const itemUrl = urlXhr.response.result.url;
-            
             res.items[i].url = itemUrl;
             resolve(res.items[i]);
           }
 
           urlXhr.onError = function () {
-            reject("URL 서버 에러발생");
+            reject('URL 서버 에러발생');
           }
 
           urlXhr.send();
@@ -110,7 +109,7 @@ app.onInputChange = function (ev) {
       ev.target.value = '';
       return;
     }
-    
+
     if (section.items.length > 0) {
       section.items = [];
     }
@@ -118,7 +117,7 @@ app.onInputChange = function (ev) {
     app.searchValue = ev.target.value;
     app.loadingOn = 'visibility';
     requestAPI.reqeustOnProgress = true;
-  
+
     requestAPI.getBooks(app.searchValue).then(function (items) {
       if (!section.items.length) {
         section.items = items;
@@ -144,7 +143,7 @@ app.onSearchClick = function () {
   if (section.items.length > 0) {
     section.items = [];
   }
-  
+
   app.loadingOn = 'visibility';
   requestAPI.reqeustOnProgress = true;
 

@@ -32,7 +32,7 @@ export default function View (template, options = {}) {
     const templateData = Object.assign({}, that.context, placeholders);
     const oldElement = element;
     element = domify(template(templateData));
-    
+
     if (element instanceof DocumentFragment) {
       throw new GorillaError('Gorilla component must be wrapped in a single element');
     }
@@ -44,14 +44,13 @@ export default function View (template, options = {}) {
         target.parentNode.replaceChild(childRenderables[childName], target);
       }
     }
-    
+
     if (oldElement && oldElement.parentNode) {
       oldElement.parentNode.replaceChild(element, oldElement);
     }
 
     return element;
   };
-
 
   that.destroy = function () {
     if (!element || !element.parentNode) {

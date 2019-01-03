@@ -5,7 +5,7 @@ import SUPPORTED_DOM_EVENTS from './utils/supportedDOMEvents';
 
 function Component(template, context, children) {
   const that = this;
-  
+
   that._element = null;
   that._view = new View(template, { context, children });
   that._publish = lifecycleEventsMixin(that);
