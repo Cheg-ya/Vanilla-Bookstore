@@ -22,9 +22,9 @@ const requestAPI = {
 
     return new Promise(function (resolve, reject) {
       const xhr = new XMLHttpRequest();
-      const adress = `http://localhost:3000/v1/search/book?query=${query}&start=${that.displayNumber}`;
+      const address = `http://localhost:3000/v1/search/book?query=${query}&start=${that.displayNumber}`;
 
-      xhr.open('GET', adress, true);
+      xhr.open('GET', address, true);
       xhr.responseType = 'json';
       xhr.onload = function () {
         setTimeout(function () {
@@ -83,6 +83,9 @@ const requestAPI = {
       });
 
       return res;
+    }).catch(function (err) {
+      alert(err);
+      throw new Error(err);
     });
   }
 }
