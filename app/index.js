@@ -83,6 +83,9 @@ const requestAPI = {
       });
 
       return res;
+    }).catch(function (err) {
+      alert(err);
+      throw new Error(err);
     });
   }
 }
